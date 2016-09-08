@@ -1,0 +1,13 @@
+{
+  "env" : {
+    "node": true
+  },
+  "extends": [
+    "airbnb",
+    "standard"
+  ],
+  "rules": {
+    "prefer-arrow-callback": 0,
+    "strict": 0
+  }
+}

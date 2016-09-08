@@ -1,0 +1,40 @@
+{
+  "name": "storj-heroku-addon",
+  "version": "0.0.0-unreleased",
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "node": "4.x"
+  },
+  "scripts": {
+    "pretest": "jshint --config .jshintrc",
+    "test": "istanbul cover ./node_modules/.bin/tape tests/**/*.js",
+    "start": "node index.js",
+    "posttest": "nsp check; snyk test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:retrohacker/storj-heroku-addon"
+  },
+  "author": "William Blankenship <william.jblankenship@gmail.com>",
+  "license": "(AGPL-3.0 AND LGPL-3.0)",
+  "bugs": {
+    "url": "https://github.com/retrohacker/storj-heroku-addon/issues"
+  },
+  "homepage": "https://github.com/retrohacker/storj-heroku-addon",
+  "dependencies": {
+    "basic-auth": "^1.0.4",
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "istanbul": "^0.4.5",
+    "mongodb": "^2.2.9",
+    "node-uuid": "^1.4.7",
+    "storj": "^3.0.4",
+    "tape": "^4.6.0"
+  },
+  "devDependencies": {
+    "jshint": "^2.9.3",
+    "nsp": "^2.6.1",
+    "snyk": "^1.18.0"
+  }
+}

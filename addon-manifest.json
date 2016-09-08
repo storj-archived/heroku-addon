@@ -1,0 +1,22 @@
+{
+  "id": "storj",
+  "name": "Storj",
+  "cli_plugin_name": "storj",
+  "api": {
+    "config_vars_prefix": "STORJ",
+    "config_vars": ["STORJ_EMAIL", "STORJ_PASSWORD"],
+    "requires": [],
+    "regions": ["us"],
+    "password": "aa8e4581c03bd18468e696d6c50c322d",
+    "sso_salt": "93e974fa0279ca541dca346f1efebf9d",
+    "regions": ["*"],
+    "production": {
+      "base_url": "https://heroku.storj.io/heroku/resources",
+      "sso_url": "https://heroku.storj.io/heroku/resources"
+    },
+    "test": {
+      "base_url": "http://localhost:8080/heroku/resources",
+      "sso_url": "http://localhost:8080/heroku/resources"
+    }
+  }
+}
