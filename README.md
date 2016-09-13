@@ -1,5 +1,4 @@
-Storj Heroku Add-on
-===================
+# Storj Heroku Add-on
 
 This Heroku add-on allows users to store data on the storj network through the heroku marketplace.
 
