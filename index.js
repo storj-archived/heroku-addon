@@ -32,11 +32,16 @@ app.use('*', function addUUID(req, res, next) {
   next()
 })
 
+// Health check
+app.get('/health', function(req, res) {
+  return res.status(200).end()
+})
+
 // Ensure incomming requests are authenticated using our heroku shared secrets
-app.use('*', function enforceAuth(req, res, next) {
-  var creds = auth(req)
-  if (creds.pass !== config.heroku.password ||
-      creds.name !== config.heroku.id) {
+app.use('/heroku', function enforceAuth(req, res, next) {
+  var creds = auth(req);
+  if ( creds.pass !== config.heroku.password ||
+       creds.name !== config.heroku.id ) {
     // If either the id or password don't match, reject the request
     console.error(`${req.uuid}: Incomming request failed authentication`)
     console.error(`${req.uuid}: ID: "${creds.name}" Password: "${creds.pass}"`)
