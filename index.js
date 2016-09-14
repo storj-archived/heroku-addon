@@ -45,6 +45,11 @@ app.get('/', function(req, res) {
 // Ensure incomming requests are authenticated using our heroku shared secrets
 app.use('/heroku', function enforceAuth(req, res, next) {
   var creds = auth(req);
+  if ( typeof creds === 'undefined' ) {
+    console.error(`${req.uuid}: Incoming request provided no auth data`);
+    return res.status(401).end();
+  }
+
   if ( creds.pass !== config.heroku.password ||
        creds.name !== config.heroku.id ) {
     // If either the id or password don't match, reject the request
