@@ -13,7 +13,7 @@ function getCollection (cb) {
     return cb(error, null);
   }
 
-  return MongoClient.connect(config.db.url, function mongoConnected(e, db) {
+  return MongoClient.connect(config.db.url, config.db.options, function mongoConnected(e, db) {
     if(e) return cb(e)
     connection = db
     return cb(null, db.collection(config.db.collection))

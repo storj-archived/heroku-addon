@@ -5,7 +5,17 @@ module.exports = {
   },
   db: {
     url: process.env.MONGO_URL || 'mongodb://localhost:27017',
-    collection: 'account'
+    collection: 'account',
+    options: {
+      server: {
+        ssl: ( process.env.MONGO_SSL === "true" ) || false,
+        sslValidate: ( process.env.MONGO_SSL_VALIDATE  === "true" ) || false,
+      },
+      replSet: {
+        rs_name: process.env.MONGO_RS_NAME
+      },
+      mongos: {}
+    }
   },
   // For heroku, we either use the provided environment variables for
   // production, or we use the values from addon-manifest to match what kensa
