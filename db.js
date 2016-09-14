@@ -7,6 +7,12 @@ function getCollection (cb) {
   if(connection) {
     return cb(null, connection.collection(config.db.collection))
   }
+
+  if(typeof config.db.url !== 'string') {
+    var error = 'issue with db';
+    return cb(error, null);
+  }
+
   return MongoClient.connect(config.db.url, function mongoConnected(e, db) {
     if(e) return cb(e)
     connection = db

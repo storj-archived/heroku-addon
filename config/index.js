@@ -4,7 +4,7 @@ module.exports = {
     api: process.env.BRIDGE_ENDPOINT || 'http://api.staging.storj.io'
   },
   db: {
-    url: process.env.MONGO_URL,
+    url: process.env.MONGO_URL || 'mongodb://localhost:27017',
     collection: 'account'
   },
   // For heroku, we either use the provided environment variables for
