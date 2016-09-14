@@ -36,6 +36,11 @@ app.use('*', function addUUID(req, res, next) {
 app.get('/health', function(req, res) {
   return res.status(200).end()
 })
+//
+// Health check Kubernetes
+app.get('/', function(req, res) {
+  return res.status(200).end()
+})
 
 // Ensure incomming requests are authenticated using our heroku shared secrets
 app.use('/heroku', function enforceAuth(req, res, next) {
