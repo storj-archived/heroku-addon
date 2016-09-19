@@ -1,7 +1,7 @@
 var addonManifest = require('../addon-manifest.json')
 module.exports = {
   storj: {
-    api: process.env.BRIDGE_ENDPOINT || 'http://api.staging.storj.io'
+    api: process.env.BRIDGE_ENDPOINT || 'https://api.staging.storj.io'
   },
   db: {
     url: process.env.MONGO_URL || 'mongodb://localhost:27017',
