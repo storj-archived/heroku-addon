@@ -96,6 +96,7 @@ $ heroku addons:upgrade Storj:newplan
 -----> Upgrading Storj:newplan to sharp-mountain-4005... done, v18 ($5/mo)
        Your plan has been updated to: Storj:newplan
 ```
+
 ## Removing the add-on
 We would be sad to see you go, but Storj can be removed via the CLI.
 > warning
@@ -104,5 +105,6 @@ We would be sad to see you go, but Storj can be removed via the CLI.
 $ heroku addons:destroy Storj
 -----> Removing Storj from sharp-mountain-4005... done, v20 (free)
 ```
+
 ## Support
 All Storj support and runtime issues should be submitted via one of the [Heroku Support channels](support-channels). Any non-support related issues or product feedback is welcome at [[your channels]].
