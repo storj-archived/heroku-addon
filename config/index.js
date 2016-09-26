@@ -1,5 +1,8 @@
+'use strict';
+
 /* istanbul ignore next */
-var addonManifest = require('../addon-manifest.json')
+var addonManifest = require('../addon-manifest.json');
+
 module.exports = {
   storj: {
     api: process.env.BRIDGE_ENDPOINT || 'https://api.staging.storj.io'
@@ -9,8 +12,8 @@ module.exports = {
     collection: 'account',
     options: {
       server: {
-        ssl: ( process.env.MONGO_SSL === "true" ) || false,
-        sslValidate: ( process.env.MONGO_SSL_VALIDATE  === "true" ) || false,
+        ssl: ( process.env.MONGO_SSL === 'true' ) || false,
+        sslValidate: ( process.env.MONGO_SSL_VALIDATE  === 'true' ) || false,
       },
       replSet: {
         rs_name: process.env.MONGO_RS_NAME
@@ -25,8 +28,8 @@ module.exports = {
     id: process.env.HEROKU_ID || addonManifest.id,
     password: process.env.HEROKU_PASSWORD || addonManifest.api.password
   }
-}
+};
 
 // Lock this config object down so we can't accidentally change it during
 // runtime
-Object.freeze(module.exports)
+Object.freeze(module.exports);
