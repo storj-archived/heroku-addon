@@ -24,7 +24,7 @@ Sharing an account across multiple installations requires us (storj) to maintain
 
 ### Why a custom SMTP Server?
 
-This allows the bridge to continue sending emails as normal (read: no special snowflake logic for heroku in the bridge) and for those emails to be received by Heroku customers without breaking [Heroku best practices](https://devcenter.heroku.com/articles/add-on-provider-technical-best-practices#use-the-correct-email-address-for-customers). This should be relatively straight forward to implement using [haraka](https://github.com/haraka/Haraka). If it proves otherwise, we will revist this decision and find a better way.
+This allows the bridge to continue sending emails as normal (read: no special snowflake logic for heroku in the bridge) and for those emails to be received by Heroku customers without breaking [Heroku best practices](https://devcenter.heroku.com/articles/add-on-provider-technical-best-practices#use-the-correct-email-address-for-customers).
 
 ### How do customers access the bridge API?
 
