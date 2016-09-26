@@ -113,6 +113,14 @@ RUN gem install kensa
 RUN mkdir -p ./coverage/lcov-report
 RUN npm install -g local-web-server
 
+#####################################
+# Install netcat for docker_watcher #
+#####################################
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      netcat-traditional \
+  && rm -rf /var/lib/apt/lists/*
+
 ###################
 # Install Service #
 ###################
@@ -124,4 +132,7 @@ ADD ./ ./
 
 EXPOSE 8000
 
-CMD ["bash", "-c", "npm test; ws -d ./coverage/lcov-report"]
+ADD ./dockerfiles/bridge_wrapper.sh /usr/bin/bridge_wrapper.sh
+RUN chmod +x /usr/bin/bridge_wrapper.sh
+
+CMD ["bridge_wrapper.sh", "bash", "-c", "npm test; ws -d ./coverage/lcov-report"]

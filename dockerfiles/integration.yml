@@ -1,17 +1,68 @@
 version: "2"
 services:
-  test_server:
+  integration_tests:
     build:
       dockerfile: ./dockerfiles/test.Dockerfile
       context: ../
+    container_name: integration_tests
     environment:
-      - MONGO_URL=mongodb://db:27017/heroku
-      - BRIDGE_ENDPOINT=http://api.staging.storj.io
+      - DOCKER_SERVICES=service_bridge:8080,service_mongodb:27017
+      - MONGO_URL=mongodb://service_mongodb:27017/heroku
+      - BRIDGE_ENDPOINT=http://service_bridge:8080
+    networks:
+      - storj-discovery
     ports:
       - "8000:8000"
-    links:
-      - test_db:db
-  test_db:
+  service_mongodb:
     build:
       dockerfile: ./db.Dockerfile
       context: ./
+    container_name: service_mongodb
+    networks:
+      - storj-discovery
+  service_bridge:
+    build:
+      dockerfile: ./bridge.Dockerfile
+      context: ./
+    container_name: service_bridge
+    environment:
+      - DOCKER_SERVICES=service_bridge_rabbitmq:5672,service_bridge_mongodb:27017,smtp.myemail.com:25,service_bridge_account_mapper:25
+    links:
+      - "service_bridge_mailgun:smtp.myemail.com"
+    networks:
+      - storj-discovery
+  service_bridge_mongodb:
+    image: mongo
+    container_name: service_bridge_mongodb
+    networks:
+      - storj-discovery
+  service_bridge_rabbitmq:
+    image: rabbitmq
+    container_name: service_bridge_rabbitmq
+    networks:
+      - storj-discovery
+  service_bridge_mailgun:
+    build:
+      dockerfile: ./mailgun.Dockerfile
+      context: ./
+    container_name: service_bridge_mailgun
+    links:
+      - "service_bridge_account_mapper:heroku.storj.io"
+    networks:
+      - storj-discovery
+  service_bridge_account_mapper:
+    build:
+      #context: https://github.com/Storj/account-mapper.git
+      context: ../../account-mapper
+      dockerfile: ./dockerfiles/server.Dockerfile
+    environment:
+      - MAIL_API_HOST=integration_tests
+      - MAIL_API_PORT=25
+      - MAIL_API_USERNAME=foobar
+      - MAIL_API_PASSWORD=buzzbazz
+    container_name: service_bridge_account_mapper
+    networks:
+      - storj-discovery
+networks:
+  storj-discovery:
+    driver: bridge

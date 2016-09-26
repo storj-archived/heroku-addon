@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "smtp-connection": "^2.12.0",
+    "smtp-server": "^1.15.0"
+  }
+}

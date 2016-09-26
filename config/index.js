@@ -1,3 +1,4 @@
+/* istanbul ignore next */
 var addonManifest = require('../addon-manifest.json')
 module.exports = {
   storj: {

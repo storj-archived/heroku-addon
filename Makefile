@@ -17,7 +17,7 @@ help:
 kensa: docker-clean docker-build
 	docker-compose -f ./dockerfiles/kensa.yml up
 
-integration: docker-clean docker-build
+integration: docker-clean docker-build-integration
 	docker-compose -f ./dockerfiles/integration.yml up
 
 run: docker-clean docker-build
@@ -28,9 +28,17 @@ docker-clean:
 	docker-compose -f ./dockerfiles/integration.yml rm -f
 	docker-compose -f ./dockerfiles/run.yml rm -f
 
-docker-build:
+docker-build: docker-build-integration docker-build-kensa docker-build-run
 	docker-compose -f ./dockerfiles/kensa.yml build
+	docker-compose -f ./dockerfiles/run.yml build
+
+docker-build-kensa:
+	docker-compose -f ./dockerfiles/kensa.yml build
+
+docker-build-integration: ./dockerfiles
 	docker-compose -f ./dockerfiles/integration.yml build
+
+docker-build-run:
 	docker-compose -f ./dockerfiles/run.yml build
 
 deps:
@@ -39,4 +47,4 @@ deps:
 	echo "    * docker $(shell which docker > /dev/null || echo '- \033[31mNOT INSTALLED\033[37m')"
 	echo "    * docker-compose $(shell which docker-compose > /dev/null || echo '- \033[31mNOT INSTALLED\033[37m')"
 
-.PHONY: kensa docker-clean docker-build integration run deps
+.PHONY: kensa docker-clean docker-build integration run deps docker-build-integration docker-build-kensa docker-build-run

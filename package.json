@@ -35,6 +35,8 @@
   "devDependencies": {
     "jshint": "^2.9.3",
     "nsp": "^2.6.1",
+    "request": "^2.75.0",
+    "smtp-server": "^1.15.0",
     "snyk": "^1.18.0"
   }
 }
