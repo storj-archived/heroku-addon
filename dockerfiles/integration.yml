@@ -138,5 +138,6 @@ services:
     container_name: service_bridge_account_mapper
     links:
       - "service_bridge_account_mapper_heroku:api.heroku.com"
+      - "integration_tests:storj.bridge.mock"
     networks:
       - storj-discovery
