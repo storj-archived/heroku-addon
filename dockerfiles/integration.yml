@@ -57,8 +57,6 @@ services:
       dockerfile: ./db.Dockerfile
       context: ./
     container_name: service_mongodb
-    # The database' logs are _usually_ just noise, so we turn them off. If db
-    # stuff starts failing in your tests, you should turn this back on.
     networks:
       - storj-discovery
   # We create a local copy of the storj bridge service so we can keep all of
@@ -88,6 +86,8 @@ services:
   service_bridge_mongodb:
     image: mongo
     container_name: service_bridge_mongodb
+    # The database' logs are _usually_ just noise, so we turn them off. If db
+    # stuff starts failing in your tests, you should turn this back on.
     logging:
       driver: none
     networks:
@@ -95,7 +95,7 @@ services:
   # Provided the bridge with a rabbitmq instance
   service_bridge_rabbitmq:
     image: rabbitmq
-    container_name: service_bridge_rabbitmq
+    # The message queue logs are usually just noise as well
     logging:
       driver: none
     networks:
@@ -123,8 +123,7 @@ services:
       - storj-discovery
   service_bridge_account_mapper:
     build:
-      #context: https://github.com/Storj/account-mapper.git
-      context: ../../account-mapper
+      context: https://github.com/Storj/account-mapper.git
       dockerfile: ./dockerfiles/server.Dockerfile
     environment:
       - MAIL_API_HOST=integration_tests
