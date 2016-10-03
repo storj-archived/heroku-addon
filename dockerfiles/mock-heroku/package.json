@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "basic-auth": "^1.0.4",
+    "express": "^4.14.0"
+  }
+}

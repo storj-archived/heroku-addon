@@ -7,7 +7,7 @@
     "node": "4.x"
   },
   "scripts": {
-    "pretest": "jshint --config .jshintrc",
+    "pretest": "jshint --config .jshintrc **/*.js",
     "test": "istanbul cover ./node_modules/.bin/tape tests/**/*.js",
     "start": "node index.js",
     "posttest": "nsp check; snyk test"

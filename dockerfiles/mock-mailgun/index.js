@@ -39,5 +39,3 @@ var server = new SMTPServer({
 server.listen(25, '0.0.0.0', function listening() {
   console.log(`SMTP Server started on 0.0.0.0:25`);
 });
-
-

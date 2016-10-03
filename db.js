@@ -74,10 +74,22 @@ module.exports.delete = function deleteKey(key, cb) {
     };
     return c.updateOne(query, document, opts, function deleted(e, r) {
       if(e) { return cb(e); }
-      if(r.deletedCount === 0) {
-        cb(new Error('No entry found with provided email'));
+      if(r.modifiedCount === 0) {
+        return cb(new Error('No active entry found with provided email'));
       }
       return cb();
     });
+  });
+};
+
+module.exports.get = function getKey(key, cb) {
+  return getCollection(function haveConnection(e, c) {
+    var projection = {
+      _id: 0
+    };
+    var query = {
+      id: { $eq: key.id }
+    };
+    return c.findOne(query, projection, cb);
   });
 };

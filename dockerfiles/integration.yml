@@ -1,46 +1,106 @@
+# This dockerfile defines an environment to run end-to-end integration tests
+# across from the perspective of the integration-service repository. After
+# running this compose file, you should be presented with a web server allowing
+# you to view code coverage statistics.
+#
+# All dependent services in the micro-service array are wired up to our
+# integration service by either DNS hackery (links/hosts) or env vars
 version: "2"
+# Our microservice array has cyclic dependencies, meaning we can't use "links"
+# for declaring our deps in this compose file. Instead we use the container
+# names on a bridge network. Essentially the bridge network will try resolve
+# all DNS requests to a docker container with that name first. We will still
+# use "links" occassionally to do DNS magic when mocking out 3rd party services
+# such as heroku.
+networks:
+  storj-discovery:
+    driver: bridge
 services:
+  # This is the service that drives our integration tests and collects
+  # code-coverage on the service defined in this repo. All integration tests
+  # are defined using tape and driven against this code base.
   integration_tests:
     build:
       dockerfile: ./dockerfiles/test.Dockerfile
       context: ../
     container_name: integration_tests
     environment:
-      - DOCKER_SERVICES=service_bridge:8080,service_mongodb:27017
+      # DOCKER_SERVICES is a simple bash script that waites for a service to
+      # bind on each of the {hosts,ports} tuples defined in the comma separated
+      # array passed through the environment variable. Once all of the services
+      # are online, it will start our service.
+      #
+      # Here we wait for the bridge and database to be available as our service
+      # directly depends on them. We also wait for api.heroku.com to be
+      # available as we are mocking out that service for our account-mapper and
+      # account-mapper doesn't have our fancy-dancy DOCKER_SERVICES service,
+      # we don't want to bleed deps between repos.
+      - DOCKER_SERVICES=service_bridge:8080,service_mongodb:27017,api.heroku.com:80
+      # Tell our server where to look for it's mongo database at
       - MONGO_URL=mongodb://service_mongodb:27017/heroku
+      # Tell our server where the storj bridge service lives (this lets us use
+      # a local copy of the bridge declared in this compose file)
       - BRIDGE_ENDPOINT=http://service_bridge:8080
+    # DNS magic that resolves requests to api.heroku.com to our mock heroku
+    # service, allowing our integration tests to remain local
+    links:
+      - "service_bridge_account_mapper_heroku:api.heroku.com"
     networks:
       - storj-discovery
     ports:
       - "8000:8000"
+  # Declare the database backing our integration testing service. We keep
+  # databases separate to ensure we don't end up coupling our services through
+  # our persistance tier.
   service_mongodb:
     build:
       dockerfile: ./db.Dockerfile
       context: ./
     container_name: service_mongodb
+    # The database' logs are _usually_ just noise, so we turn them off. If db
+    # stuff starts failing in your tests, you should turn this back on.
     networks:
       - storj-discovery
+  # We create a local copy of the storj bridge service so we can keep all of
+  # our integration tests local. Since the bridge logs will be displayed right
+  # along-side our integration service's logs we can trace a request all the
+  # way through the service stack during testing.
   service_bridge:
     build:
       dockerfile: ./bridge.Dockerfile
       context: ./
     container_name: service_bridge
+    # For a description of the DOCKER_SERVICES env var, see the
+    # integration_service service.
+    #
+    # Wait for the rabbitmqx and mongodb services to be up for state, and
+    # wait for smtp.myemail.com (which is the mock mailgun server) and the
+    # account mapper service (which we define further down this file) to be
+    # available before we start up the bridge.
     environment:
       - DOCKER_SERVICES=service_bridge_rabbitmq:5672,service_bridge_mongodb:27017,smtp.myemail.com:25,service_bridge_account_mapper:25
     links:
       - "service_bridge_mailgun:smtp.myemail.com"
     networks:
       - storj-discovery
+  # We define our second mongodb database to support the storj bridge, keeping
+  # the data from the bridge and the integration service separate.
   service_bridge_mongodb:
     image: mongo
     container_name: service_bridge_mongodb
+    logging:
+      driver: none
     networks:
       - storj-discovery
+  # Provided the bridge with a rabbitmq instance
   service_bridge_rabbitmq:
     image: rabbitmq
     container_name: service_bridge_rabbitmq
+    logging:
+      driver: none
     networks:
       - storj-discovery
+  # Create a mocked out mailgun service which simply forwards emails
   service_bridge_mailgun:
     build:
       dockerfile: ./mailgun.Dockerfile
@@ -48,6 +108,17 @@ services:
     container_name: service_bridge_mailgun
     links:
       - "service_bridge_account_mapper:heroku.storj.io"
+      - "integration_tests:gmail.com"
+    networks:
+      - storj-discovery
+  service_bridge_account_mapper_heroku:
+    build:
+      dockerfile: ./heroku.Dockerfile
+      context: ./
+    container_name: service_bridge_account_mapper_heroku
+    environment:
+      - HEROKU_ID=foobar
+      - HEROKU_PASSWORD=buzzbazz
     networks:
       - storj-discovery
   service_bridge_account_mapper:
@@ -60,9 +131,13 @@ services:
       - MAIL_API_PORT=25
       - MAIL_API_USERNAME=foobar
       - MAIL_API_PASSWORD=buzzbazz
+      - MAIL_SECURE=false
+      # Use HTTP instead of HTTPS
+      - HEROKU_URL=http://api.heroku.com
+      - HEROKU_ID=foobar
+      - HEROKU_PASSWORD=buzzbazz
     container_name: service_bridge_account_mapper
+    links:
+      - "service_bridge_account_mapper_heroku:api.heroku.com"
     networks:
       - storj-discovery
-networks:
-  storj-discovery:
-    driver: bridge

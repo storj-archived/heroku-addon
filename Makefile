@@ -13,7 +13,6 @@ help:
 	echo "    docker-clean - remove all docker containers"
 	echo "    docker-build - build fresh docker containers"
 
-
 kensa: docker-clean docker-build
 	docker-compose -f ./dockerfiles/kensa.yml up
 
