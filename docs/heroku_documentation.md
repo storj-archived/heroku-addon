@@ -107,4 +107,4 @@ $ heroku addons:destroy Storj
 ```
 
 ## Support
-All Storj support and runtime issues should be submitted via one of the [Heroku Support channels](support-channels). Any non-support related issues or product feedback is welcome at [[your channels]].
+All Storj support and runtime issues should be submitted via one of the [Heroku Support channels](support-channels). Any non-support related issues or product feedback is welcome in our community chat at https://community.storj.io.
