@@ -1,6 +1,55 @@
 # Storj Heroku Add-on
 
-This Heroku add-on allows users to store data on the storj network through the heroku marketplace.
+The official Storj add-on for Heroku
+
+# Deployment
+
+## Service Dependencies
+
+This service depends on:
+
+* MongoDB
+* [The Storj Bridge](https://github.com/storj/bridge)
+* Heroku
+* Mailgun
+* [Storj-Heroku-SMTP](https://github.com/storj/smtp)
+
+## Config
+
+The configuration object (along with scrubbing logic) can be found in [config/index.js](./config/index.js)
+
+Everything can be configured through environment variables.
+
+* `BRIDGE_ENDPOINT` - default `https://api.staging.storj.io`
+* `MONGO_URL` - default `mongodb://localhost:27017`
+* `MONGO_COLLECTION` - default `account`
+* `MONGO_SSL` - default `false` (must provide `true`, case sensitve, to toggle)
+* `MONGO_RS_NAME` - The replSet for Mongodb default `undefined` 
+* `HEROKU_ID` - default is the value of `id` in [./addon-manifest.json](./addon-manifest.json)
+* `HEROKU_PASSWORD` - default is the value of `api.password` in [./addon-manifest.json](./addon-mainfest.json)
+* `LOG_LEVEL` - default is `info`, valid settings are `debug`, `info`, `warn`, `error`, `none`
+
+# Development
+
+## Testing
+
+Running `npm test` runs _all_ tests, include integration tests, for this service. Running this locally is probably not what you want.
+
+Instead, run `make`. It will give you all of the supported commands for running this application.
+
+`make deps` will list all of the dependencies necessary to run the tests, and will check to see if they are installed.
+
+`make test` will run the integration tests using Docker. If tests are failing, and you would like to see output from the services to understand why, you can open [./dockerfiles/test.yml](./dockerfiles/test.yml) and remove the `logging: - driver: none` lines from the services whose output you would like to see. If you want to see output from [./index.js](./index.js) change the environment variable `LOG_LEVEL` in [./dockerfiles/test.yml](./dockerfiles/test.yml) to `debug`.
+
+## Style guide
+
+`npm run pretest` will run the `jshint` tests against the codebase.
+
+## Code coverage
+
+This project uses istanbul for code coverage. If you run `npm run unit`, you will notice relatively low test coverage. The unit tests compliment the integration tests. When you run `make test`, the integration tests will gather test coverage as well giving you the full 100% coverage. After running `make test`, a coverage report will be available on `127.0.0.1:8000`.
+
+# How it works
 
 ## High Level Overview
 
@@ -16,7 +65,7 @@ When heroku pays us, we will apply the payment to the storj account [UUID]@herok
 
 ### Persistance of user data
 
-When a user installs an addon, it is not bound to a single app. A single app is capable of using multiple installations of the same addon, and a single installation of an addon can be shared across multiple apps. These cases can be enabled by a flag in our [app manifest](https://devcenter.heroku.com/articles/add-on-manifest) using the features `many_per_app` and `attachable`.
+When a user installs an addon, it is not bound to a single app. A single app is capable of using multiple installations of the same addon, and a single installation of an addon can be shared across multiple apps. These cases can be enabled by a flag in our [addon-manifest.json](https://devcenter.heroku.com/articles/add-on-manifest) using the features `many_per_app` and `attachable`.
 
 ### Why a 1:1 mapping between installations and storj accounts?
 

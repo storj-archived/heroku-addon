@@ -7,38 +7,20 @@ help:
 	echo "  Commands: "
 	echo
 	echo "    help - show this message (default)"
-	echo "    run - run a containerized version of this architecture locally"
-	echo "    kensa - run kensa against the current codebase"
 	echo "    test - run tests against the codebase"
 	echo "    docker-clean - remove all docker containers"
 	echo "    docker-build - build fresh docker containers"
 
-kensa: docker-clean docker-build
-	docker-compose -f ./dockerfiles/kensa.yml up
-
-test: docker-clean docker-build-test
+test: docker-clean docker-build
 	docker-compose -f ./dockerfiles/test.yml up
 
-run: docker-clean docker-build
-	docker-compose -f ./dockerfiles/run.yml up
-
 docker-clean:
-	docker-compose -f ./dockerfiles/kensa.yml rm -f
 	docker-compose -f ./dockerfiles/test.yml rm -f
-	docker-compose -f ./dockerfiles/run.yml rm -f
 
-docker-build: docker-build-test docker-build-kensa docker-build-run
-	docker-compose -f ./dockerfiles/kensa.yml build
-	docker-compose -f ./dockerfiles/run.yml build
 
-docker-build-kensa:
-	docker-compose -f ./dockerfiles/kensa.yml build
-
-docker-build-test: ./dockerfiles
+docker-build: ./dockerfiles
 	docker-compose -f ./dockerfiles/test.yml build
 
-docker-build-run:
-	docker-compose -f ./dockerfiles/run.yml build
 
 deps:
 	echo "  Dependencies: "
@@ -46,4 +28,4 @@ deps:
 	echo "    * docker $(shell which docker > /dev/null || echo '- \033[31mNOT INSTALLED\033[37m')"
 	echo "    * docker-compose $(shell which docker-compose > /dev/null || echo '- \033[31mNOT INSTALLED\033[37m')"
 
-.PHONY: kensa docker-clean docker-build test run deps docker-build-test docker-build-kensa docker-build-run
+.PHONY: docker-clean docker-build test deps

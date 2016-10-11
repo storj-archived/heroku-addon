@@ -11,14 +11,14 @@ module.exports = {
   },
   db: {
     url: process.env.MONGO_URL || 'mongodb://localhost:27017',
-    collection: 'account',
+    collection: process.env.MONGO_COLLECTION || 'account',
     options: {
       server: {
         ssl: ( process.env.MONGO_SSL === 'true' ) || false,
         sslValidate: ( process.env.MONGO_SSL_VALIDATE  === 'true' ) || false,
       },
       replSet: {
-        rs_name: process.env.MONGO_RS_NAME
+        rs_name: process.env.MONGO_RS_NAME || undefined
       },
       mongos: {}
     }

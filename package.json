@@ -8,7 +8,9 @@
   },
   "scripts": {
     "pretest": "jshint --config .jshintrc -c .jshintrc --exclude node_modules *.js config/*.js dockerfiles/*/*.js tests/**/*.js",
+    "preunit": "jshint --config .jshintrc -c .jshintrc --exclude node_modules *.js config/*.js dockerfiles/*/*.js tests/**/*.js",
     "test": "istanbul cover ./node_modules/.bin/tape tests/**/*.js",
+    "unit": "istanbul cover ./node_modules/.bin/tape tests/{db, kensa, index}/*.js",
     "start": "node index.js",
     "posttest": "nsp check; snyk test"
   },
