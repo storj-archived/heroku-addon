@@ -41,6 +41,8 @@ services:
       # Tell our server where the storj bridge service lives (this lets us use
       # a local copy of the bridge declared in this compose file)
       - BRIDGE_ENDPOINT=http://service_bridge:8080
+      # We don't want any logs from the service in our unit tests
+      - LOG_LEVEL=none
     # DNS magic that resolves requests to api.heroku.com to our mock heroku
     # service, allowing our integration tests to remain local
     links:
@@ -57,6 +59,8 @@ services:
       dockerfile: ./db.Dockerfile
       context: ./
     container_name: service_mongodb
+    logging:
+      driver: none
     networks:
       - storj-discovery
   # We create a local copy of the storj bridge service so we can keep all of
@@ -68,6 +72,8 @@ services:
       dockerfile: ./bridge.Dockerfile
       context: ./
     container_name: service_bridge
+    logging:
+      driver: none
     # For a description of the DOCKER_SERVICES env var, see the
     # integration_service service.
     #
@@ -106,6 +112,8 @@ services:
       dockerfile: ./mailgun.Dockerfile
       context: ./
     container_name: service_bridge_mailgun
+    logging:
+      driver: none
     links:
       - "service_bridge_account_mapper:heroku.storj.io"
       - "integration_tests:gmail.com"
@@ -116,6 +124,8 @@ services:
       dockerfile: ./heroku.Dockerfile
       context: ./
     container_name: service_bridge_account_mapper_heroku
+    logging:
+      driver: none
     environment:
       - HEROKU_ID=foobar
       - HEROKU_PASSWORD=buzzbazz
@@ -137,6 +147,8 @@ services:
       - HEROKU_ID=foobar
       - HEROKU_PASSWORD=buzzbazz
     container_name: service_bridge_account_mapper
+    logging:
+      driver: none
     links:
       - "service_bridge_account_mapper_heroku:api.heroku.com"
       - "integration_tests:storj.bridge.mock"

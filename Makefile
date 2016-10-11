@@ -9,33 +9,33 @@ help:
 	echo "    help - show this message (default)"
 	echo "    run - run a containerized version of this architecture locally"
 	echo "    kensa - run kensa against the current codebase"
-	echo "    integration - run integration tests against the codebase"
+	echo "    test - run tests against the codebase"
 	echo "    docker-clean - remove all docker containers"
 	echo "    docker-build - build fresh docker containers"
 
 kensa: docker-clean docker-build
 	docker-compose -f ./dockerfiles/kensa.yml up
 
-integration: docker-clean docker-build-integration
-	docker-compose -f ./dockerfiles/integration.yml up
+test: docker-clean docker-build-test
+	docker-compose -f ./dockerfiles/test.yml up
 
 run: docker-clean docker-build
 	docker-compose -f ./dockerfiles/run.yml up
 
 docker-clean:
 	docker-compose -f ./dockerfiles/kensa.yml rm -f
-	docker-compose -f ./dockerfiles/integration.yml rm -f
+	docker-compose -f ./dockerfiles/test.yml rm -f
 	docker-compose -f ./dockerfiles/run.yml rm -f
 
-docker-build: docker-build-integration docker-build-kensa docker-build-run
+docker-build: docker-build-test docker-build-kensa docker-build-run
 	docker-compose -f ./dockerfiles/kensa.yml build
 	docker-compose -f ./dockerfiles/run.yml build
 
 docker-build-kensa:
 	docker-compose -f ./dockerfiles/kensa.yml build
 
-docker-build-integration: ./dockerfiles
-	docker-compose -f ./dockerfiles/integration.yml build
+docker-build-test: ./dockerfiles
+	docker-compose -f ./dockerfiles/test.yml build
 
 docker-build-run:
 	docker-compose -f ./dockerfiles/run.yml build
@@ -46,4 +46,4 @@ deps:
 	echo "    * docker $(shell which docker > /dev/null || echo '- \033[31mNOT INSTALLED\033[37m')"
 	echo "    * docker-compose $(shell which docker-compose > /dev/null || echo '- \033[31mNOT INSTALLED\033[37m')"
 
-.PHONY: kensa docker-clean docker-build integration run deps docker-build-integration docker-build-kensa docker-build-run
+.PHONY: kensa docker-clean docker-build test run deps docker-build-test docker-build-kensa docker-build-run

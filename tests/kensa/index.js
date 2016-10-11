@@ -1,18 +1,23 @@
 'use strict';
 
 var test = require('tape');
-var spawn = require('child_process').spawn;
+var exec = require('child_process').exec;
 var app = require('../../index.js');
 
 test('Should pass kensa', function(t) {
-  t.plan(1);
-  var stdio = { stdio: ['ignore', process.stdout, process.stderr] };
+  t.plan(2);
   var server = app(8080);
   server.on('listening', function() {
-    spawn('kensa', ['test','all'], stdio)
-      .on('close', function (code) {
+    exec('kensa test all', {}, function (error, stdout, stderr) {
         server.close();
-        t.equal(code, 0, 'Kensa passes with no errors');
-      });
+        t.error(error, 'Process should run with no errors');
+        var code = (error === null) ? 0 : error.code;
+        t.equal(code, 0, 'Kensa success status');
+        // Only print kensa output if it failed to run
+        if(error) {
+          console.log(stdout);
+          console.error(stderr);
+        }
+    });
   });
 });

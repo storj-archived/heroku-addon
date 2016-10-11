@@ -1,6 +1,7 @@
 'use strict';
 
 var addonManifest = require('../addon-manifest.json');
+var bole = require('bole');
 
 /* We don't do code coverage on our configuration file */
 /* istanbul ignore next */
@@ -28,8 +29,18 @@ module.exports = {
   heroku: {
     id: process.env.HEROKU_ID || addonManifest.id,
     password: process.env.HEROKU_PASSWORD || addonManifest.api.password
+  },
+  log: {
+    level: process.env.LOG_LEVEL || 'info'
   }
 };
+
+// Configure our logging
+/* istanbul ignore next */
+bole.output({
+  level: module.exports.log.level,
+  stream: process.stdout
+});
 
 // We throw here. Throwing is an anti-pattern, but in this case we want to make
 // sure the server doesn't start with an invalid configuration file. Let the

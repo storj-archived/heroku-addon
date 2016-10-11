@@ -7,7 +7,7 @@
     "node": "4.x"
   },
   "scripts": {
-    "pretest": "jshint --config .jshintrc **/*.js",
+    "pretest": "jshint --config .jshintrc -c .jshintrc --exclude node_modules *.js config/*.js dockerfiles/*/*.js tests/**/*.js",
     "test": "istanbul cover ./node_modules/.bin/tape tests/**/*.js",
     "start": "node index.js",
     "posttest": "nsp check; snyk test"
@@ -25,6 +25,7 @@
   "dependencies": {
     "basic-auth": "^1.0.4",
     "body-parser": "^1.15.2",
+    "bole": "^3.0.1",
     "express": "^4.14.0",
     "istanbul": "^0.4.5",
     "mongodb": "^2.2.9",

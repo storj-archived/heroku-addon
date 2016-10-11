@@ -17,6 +17,8 @@ var config = require('./config');
 // node-uuid allows us to generate a UUID for each request, so we can use it
 // when logging to help with tracing
 var uuid = require('node-uuid');
+// We use bole for logging
+var log = require('bole')('storj-heroku');
 
 // Begin building our http server
 var app = express();
@@ -48,15 +50,15 @@ app.use('/heroku', function enforceAuth(req, res, next) {
   var creds = auth(req);
 
   if ( typeof creds === 'undefined' ) {
-    console.error(`${req.uuid}: Incoming request provided no auth data`);
+    log.error(`${req.uuid}: Incoming request provided no auth data`);
     return res.status(401).end();
   }
 
   if ( creds.pass !== config.heroku.password ||
        creds.name !== config.heroku.id ) {
     // If either the id or password don't match, reject the request
-    console.error(`${req.uuid}: Incomming request failed authentication`);
-    console.error(`${req.uuid}: ID: "${creds.name}" Password: "${creds.pass}"`);
+    log.error(`${req.uuid}: Incomming request failed authentication`);
+    log.error(`${req.uuid}: ID: "${creds.name}" Password: "${creds.pass}"`);
     return res.status(401).end();
   }
   // If we pass authentication, let the next handler take over
@@ -77,7 +79,7 @@ app.post('/heroku/resources', function provisionRequest(req, res) {
   var email = `${req.body.uuid}@heroku.storj.io`;
   // Generate a random password for our user
   var password = crypto.randomBytes(48).toString('base64');
-  console.log(`${req.uuid}: Creating user: "${email}"`);
+  log.info(`${req.uuid}: Creating user: "${email}"`);
   // Create a new account on the bridge using the email address and password
   // generated above
   storjClient.createUser({
@@ -87,14 +89,14 @@ app.post('/heroku/resources', function provisionRequest(req, res) {
     // If we fail to create the user on the bridge, return a message asking the
     // user to try again later, and give heroku a 503.
     if (e) {
-      console.log(`${req.uuid}: "${e.message}"`);
+      log.info(`${req.uuid}: "${e.message}"`);
       return res.status(503).json({
         'message': `${req.uuid}: ` +
           `Unable to create user on bridge, please try again later`
       });
     }
 
-    console.log(`${req.uuid}: Adding "${email}" to DB`);
+    log.info(`${req.uuid}: Adding "${email}" to DB`);
     var document = {
       // All add-on are identified by their heroku UUID, so we will use that
       // as the index key
@@ -115,7 +117,7 @@ app.post('/heroku/resources', function provisionRequest(req, res) {
       // If we fail to add the user to the database, give heroku a 503 and tell
       // the user what happened
       if(e) {
-        console.error(`${req.uuid}: ${e.message}`);
+        log.error(`${req.uuid}: ${e.message}`);
         return res.status(503).json({
           'message': `${req.uuid}: ` +
             `Unable to create user in Database, please try again later`
@@ -163,7 +165,7 @@ app.put('/heroku/resources/:id', function(req, res) {
     // If we failed to commit the change to the database, let heroku know it
     // failed so they can retry later
     if (e) {
-      console.error(`${req.uuid}: ${e.message}`);
+      log.error(`${req.uuid}: ${e.message}`);
       return res.status(503).json({
         'message': `${req.uuid}: ` +
           `Unable to update plan in database, please try again later`
@@ -194,7 +196,7 @@ app.delete('/heroku/resources/:id', function(req, res) {
     // If we failed to commit the change to the database, let heroku know it
     // failed so they can retry later
     if (e) {
-      console.log(`${req.uuid}: ${e.message}`);
+      log.info(`${req.uuid}: ${e.message}`);
       return res.status(503).json({
         'message': `${req.uuid}: ` +
           `Unable to delete plan in database, please try again later`
@@ -226,6 +228,6 @@ if(module.parent) {
   // If we are started directly from the command line, go ahead and run the
   // server on port 8080
   app.listen(8080, function() {
-    console.log('Listening on port: 8080');
+    log.info('Listening on port: 8080');
   });
 }
