@@ -5,16 +5,14 @@
 var test = require('tape');
 var db = require('../../db.js');
 
-var collectionMock = {
-};
+var collectionMock = {};
 
 var connectionMock = {
   close: function (cb) { return cb(); }
 };
 
 var mongodbMock = {
-  MongoClient: {
-  }
+  MongoClient: {}
 };
 
 test('Setup', function (t) {
