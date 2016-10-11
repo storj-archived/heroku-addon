@@ -1,8 +1,9 @@
 'use strict';
 
-/* istanbul ignore next */
 var addonManifest = require('../addon-manifest.json');
 
+/* We don't do code coverage on our configuration file */
+/* istanbul ignore next */
 module.exports = {
   storj: {
     api: process.env.BRIDGE_ENDPOINT || 'https://api.staging.storj.io'
@@ -29,6 +30,18 @@ module.exports = {
     password: process.env.HEROKU_PASSWORD || addonManifest.api.password
   }
 };
+
+// We throw here. Throwing is an anti-pattern, but in this case we want to make
+// sure the server doesn't start with an invalid configuration file. Let the
+// process die and give a meaningful stack trace and error message.
+/* istanbul ignore next */
+function scrubConfig(config) {
+  if(typeof config.db.url !== 'string') {
+    throw new Error('MONGO_URL must be a string');
+  }
+}
+
+scrubConfig(module.exports);
 
 // Lock this config object down so we can't accidentally change it during
 // runtime

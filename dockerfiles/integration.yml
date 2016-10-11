@@ -123,7 +123,8 @@ services:
       - storj-discovery
   service_bridge_account_mapper:
     build:
-      context: https://github.com/Storj/account-mapper.git
+      #context: https://github.com/Storj/account-mapper.git
+      context: ../../account-mapper
       dockerfile: ./dockerfiles/server.Dockerfile
     environment:
       - MAIL_API_HOST=integration_tests

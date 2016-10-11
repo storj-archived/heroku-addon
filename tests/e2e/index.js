@@ -9,7 +9,7 @@ var db = require(`../../db.js`);
 var http = require(`http`);
 
 // Use the same server for all tests
-var port = 8000
+var port = 8000;
 var server = index(port);
 
 test(`Creating user sends email`, function (t) {
@@ -26,18 +26,41 @@ test(`Creating user sends email`, function (t) {
   };
 
   // Start a server to wait for the authentication request
-  var callback = http.createServer(function (req) {
-    t.pass('Received callback!')
+  var callback = http.createServer(function (req, resp) {
+    t.pass('Received callback!');
+    resp.end();
     callback.close(function () {
-      t.end()
-    })
-  }).listen(8080)
+      t.end();
+    });
+  }).listen(8080);
 
   request.post(`http://127.0.0.1:${port}/heroku/resources`,
     reqOpts,
     function userCreated (e, res) {
-      t.error(e);
+      t.error(e, 'Http request complets without error');
       t.equal(res.statusCode, 200, `Created user`);
+  });
+});
+
+test(`Creating multiple identical users fails`, function(t) {
+  var reqOpts = {
+    auth: {
+      'user': config.heroku.id,
+      'pass': config.heroku.password
+    },
+    body: {
+      'uuid': uuid,
+      'plan': `free`
+    },
+    json: true
+  };
+
+  request.post(`http://127.0.0.1:${port}/heroku/resources`,
+    reqOpts,
+    function userCreated (e, res) {
+      t.error(e, 'Http request complets without error');
+      t.equal(res.statusCode, 503, `Fails to create user`);
+      t.end();
   });
 });
 
@@ -55,14 +78,35 @@ test(`Updating user changes user plan in db`, function (t) {
 
   var url = `http://127.0.0.1:${port}/heroku/resources/${uuid}`;
   request.put(url, reqOpts, function (e, res) {
-    t.error(e);
+    t.error(e, 'Http request complets without error');
     t.equal(res.statusCode, 200, `Update worked`);
     db.get({ id: uuid }, function (e, doc) {
-      t.error(e);
+      t.error(e, 'db get complets without error');
       if(e) { throw e; }
       t.equal(doc.tier, `foobar`);
       t.end();
     });
+  });
+});
+
+test(`Can't update plan that doesn't exist`, function (t) {
+  var reqOpts = {
+    auth: {
+      'user': config.heroku.id,
+      'pass': config.heroku.password
+    },
+    body: {
+      'plan': `foobar`,
+    },
+    json: true
+  };
+
+  var wrongUUID = `38985704-2aa9-450c-9a63-6182c8b764cf`;
+  var url = `http://127.0.0.1:${port}/heroku/resources/${wrongUUID}`;
+  request.put(url, reqOpts, function (e, res) {
+    t.error(e, 'Http request complets without error');
+    t.equal(res.statusCode, 503, `Update rejected`);
+    t.end();
   });
 });
 
@@ -77,7 +121,7 @@ test(`Deleting user removes user from the database`, function (t) {
 
   var url = `http://127.0.0.1:${port}/heroku/resources/${uuid}`;
   request.delete(url, reqOpts, function (e, res) {
-    t.error(e);
+    t.error(e, 'Http request complets without error');
     t.equal(res.statusCode, 200, `User removed`);
     t.end();
   });
@@ -94,7 +138,7 @@ test(`Deleting user twice fails`, function (t) {
 
   var url = `http://127.0.0.1:${port}/heroku/resources/${uuid}`;
   request.delete(url, reqOpts, function (e, res) {
-    t.error(e);
+    t.error(e, 'Http request complets without error');
     t.equal(res.statusCode, 503, `User can\`t be removed`);
     t.end();
   });
@@ -107,7 +151,7 @@ test(`Auth is required`, function (t) {
 
   var url = `http://127.0.0.1:${port}/heroku/resources/${uuid}`;
   request.delete(url, reqOpts, function (e, res) {
-    t.error(e);
+    t.error(e, 'Http request complets without error');
     t.equal(res.statusCode, 401, `Auth fails`);
     t.end();
   });
@@ -124,8 +168,34 @@ test(`Auth must match`, function (t) {
 
   var url = `http://127.0.0.1:${port}/heroku/resources/${uuid}`;
   request.delete(url, reqOpts, function (e, res) {
-    t.error(e);
+    t.error(e, 'Http request complets without error');
     t.equal(res.statusCode, 401, `Auth fails`);
+    t.end();
+  });
+});
+
+test(`Server is responding to health checks`, function (t) {
+  var reqOpts = {
+    json: true
+  };
+
+  var url = `http://127.0.0.1:${port}/health`;
+  request.get(url, reqOpts, function (e, res) {
+    t.error(e, 'Http request complets without error');
+    t.equal(res.statusCode, 200, `Health check passes`);
+    t.end();
+  });
+});
+
+test(`Server responds to kube health checks`, function (t) {
+  var reqOpts = {
+    json: true
+  };
+
+  var url = `http://127.0.0.1:${port}/`;
+  request.get(url, reqOpts, function (e, res) {
+    t.error(e, 'Http request complets without error');
+    t.equal(res.statusCode, 200, `Health check passes`);
     t.end();
   });
 });

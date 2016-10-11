@@ -4,7 +4,7 @@ var test = require('tape');
 var spawn = require('child_process').spawn;
 var app = require('../../index.js');
 
-test.skip('Should pass kensa', function(t) {
+test('Should pass kensa', function(t) {
   t.plan(1);
   var stdio = { stdio: ['ignore', process.stdout, process.stderr] };
   var server = app(8080);
