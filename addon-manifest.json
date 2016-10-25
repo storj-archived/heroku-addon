@@ -9,7 +9,8 @@
       "STORJ_PASSWORD"
     ],
     "requires": [
-
+      "many_per_app",
+      "attachable"
     ],
     "regions": [
       "*"
