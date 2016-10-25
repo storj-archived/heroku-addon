@@ -15,6 +15,7 @@ test: docker-clean docker-build
 	docker-compose -f ./dockerfiles/test.yml up
 
 docker-clean:
+	docker-compose -f ./dockerfiles/test.yml kill
 	docker-compose -f ./dockerfiles/test.yml rm -f
 
 
