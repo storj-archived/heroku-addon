@@ -7,10 +7,10 @@
     "node": "4.x"
   },
   "scripts": {
-    "pretest": "jshint --config .jshintrc -c .jshintrc --exclude node_modules *.js config/*.js dockerfiles/*/*.js tests/**/*.js",
-    "preunit": "jshint --config .jshintrc -c .jshintrc --exclude node_modules *.js config/*.js dockerfiles/*/*.js tests/**/*.js",
-    "test": "istanbul cover ./node_modules/.bin/tape tests/**/*.js",
-    "unit": "istanbul cover ./node_modules/.bin/tape tests/{db, kensa, index}/*.js",
+    "pretest": "jshint --config .jshintrc -c .jshintrc --exclude node_modules *.js config/*.js dockerfiles/*/*.js test/**/*.js",
+    "preunit": "jshint --config .jshintrc -c .jshintrc --exclude node_modules *.js config/*.js dockerfiles/*/*.js test/**/*.js",
+    "test": "nyc ./node_modules/.bin/tape test/**/*.js",
+    "unit": "nyc cover ./node_modules/.bin/tape test/{db, kensa, index}/*.js",
     "start": "node index.js",
     "posttest": "nsp check; snyk test"
   },
@@ -29,17 +29,17 @@
     "body-parser": "^1.15.2",
     "bole": "^3.0.1",
     "express": "^4.14.0",
-    "istanbul": "^0.4.5",
     "mongodb": "^2.2.9",
     "node-uuid": "^1.4.7",
-    "storj": "^3.0.4",
-    "tape": "^4.6.0"
+    "storj": "^3.0.4"
   },
   "devDependencies": {
     "jshint": "^2.9.3",
     "nsp": "^2.6.1",
+    "nyc": "^8.3.1",
     "request": "^2.75.0",
     "smtp-server": "^1.15.0",
-    "snyk": "^1.18.0"
+    "snyk": "^1.18.0",
+    "tape": "^4.6.0"
   }
 }
