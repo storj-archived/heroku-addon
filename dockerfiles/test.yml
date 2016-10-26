@@ -51,6 +51,8 @@ services:
       - storj-discovery
     ports:
       - "8000:8000"
+    volumes:
+      - ../coverage:/usr/src/app/.nyc_output
   # Declare the database backing our integration testing service. We keep
   # databases separate to ensure we don't end up coupling our services through
   # our persistance tier.

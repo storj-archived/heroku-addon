@@ -9,10 +9,10 @@
   "scripts": {
     "pretest": "jshint --config .jshintrc -c .jshintrc --exclude node_modules *.js config/*.js dockerfiles/*/*.js test/**/*.js",
     "preunit": "jshint --config .jshintrc -c .jshintrc --exclude node_modules *.js config/*.js dockerfiles/*/*.js test/**/*.js",
-    "test": "nyc ./node_modules/.bin/tape test/**/*.js",
+    "test": "nyc -r html -r text ./node_modules/.bin/tape test/**/*.js",
     "unit": "nyc cover ./node_modules/.bin/tape test/{db, kensa, index}/*.js",
     "start": "node index.js",
-    "posttest": "nsp check; snyk test"
+    "posttest": "nsp check; snyk test; true"
   },
   "repository": {
     "type": "git",

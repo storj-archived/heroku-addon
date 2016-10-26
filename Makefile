@@ -12,7 +12,8 @@ help:
 	echo "    docker-build - build fresh docker containers"
 
 test: docker-clean docker-build
-	docker-compose -f ./dockerfiles/test.yml up
+	mkdir -p coverage
+	./dockerfiles/test_driver.sh
 
 docker-clean:
 	docker-compose -f ./dockerfiles/test.yml kill
