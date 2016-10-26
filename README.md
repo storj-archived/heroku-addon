@@ -2,6 +2,32 @@
 
 The official Storj add-on for Heroku
 
+## Development
+
+### Usage
+
+Simply run `make` and you should be good to go! By default, `make` prints out help text which shows you how to do everything needed to work on this project. If you still have questions after doing that, read on!
+
+### Testing
+
+Running `npm test` runs _all_ tests, include integration tests, for this service. Running this locally is probably not what you want.
+
+Instead, run `make`. It will give you all of the supported commands for running this application.
+
+`make deps` will list all of the dependencies necessary to run the tests, and will check to see if they are installed.
+
+`make test` will run the integration tests using Docker. If tests are failing, and you would like to see output from the services to understand why, you can open [./dockerfiles/test.yml](./dockerfiles/test.yml) and remove the `logging: - driver: none` lines from the services whose output you would like to see. If you want to see output from [./index.js](./index.js) change the environment variable `LOG_LEVEL` in [./dockerfiles/test.yml](./dockerfiles/test.yml) to `debug`.
+
+> Note: the first time you run `make test`, it will have to download the base Docker Images and build all of the images for testing. This may take _quite_ a while. Future runs will take much less time, since Images will be served from cache.
+
+### Style guide
+
+`npm run pretest` will run the `jshint` tests against the codebase.
+
+### Code coverage
+
+This project uses istanbul for code coverage. If you run `npm run unit`, you will notice relatively low test coverage. The unit tests compliment the integration tests. When you run `make test`, the integration tests will gather test coverage as well giving you the full 100% coverage. After running `make test`, a coverage report will be available on `127.0.0.1:8000`.
+
 ## Deployment
 
 ### Service Dependencies
@@ -28,28 +54,6 @@ Everything can be configured through environment variables.
 * `HEROKU_ID` - default is the value of `id` in [./addon-manifest.json](./addon-manifest.json)
 * `HEROKU_PASSWORD` - default is the value of `api.password` in [./addon-manifest.json](./addon-mainfest.json)
 * `LOG_LEVEL` - default is `info`, valid settings are `debug`, `info`, `warn`, `error`, `none`
-
-## Development
-
-### Testing
-
-Running `npm test` runs _all_ tests, include integration tests, for this service. Running this locally is probably not what you want.
-
-Instead, run `make`. It will give you all of the supported commands for running this application.
-
-`make deps` will list all of the dependencies necessary to run the tests, and will check to see if they are installed.
-
-`make test` will run the integration tests using Docker. If tests are failing, and you would like to see output from the services to understand why, you can open [./dockerfiles/test.yml](./dockerfiles/test.yml) and remove the `logging: - driver: none` lines from the services whose output you would like to see. If you want to see output from [./index.js](./index.js) change the environment variable `LOG_LEVEL` in [./dockerfiles/test.yml](./dockerfiles/test.yml) to `debug`.
-
-> Note: the first time you run `make test`, it will have to download the base Docker Images and build all of the images for testing. This may take _quite_ a while. Future runs will take much less time, since Images will be served from cache.
-
-### Style guide
-
-`npm run pretest` will run the `jshint` tests against the codebase.
-
-### Code coverage
-
-This project uses istanbul for code coverage. If you run `npm run unit`, you will notice relatively low test coverage. The unit tests compliment the integration tests. When you run `make test`, the integration tests will gather test coverage as well giving you the full 100% coverage. After running `make test`, a coverage report will be available on `127.0.0.1:8000`.
 
 ## How it works
 
