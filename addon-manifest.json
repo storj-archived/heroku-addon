@@ -23,7 +23,7 @@
     },
     "test": {
       "base_url": "http://localhost:8080/heroku/resources",
-      "sso_url": "http://localhost:8080/heroku/resources"
+      "sso_url": "http://localhost:8080/heroku/sso"
     }
   },
   "$base": 147381149247152
