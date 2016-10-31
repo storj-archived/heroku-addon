@@ -28,7 +28,8 @@ module.exports = {
   // is expecting
   heroku: {
     id: process.env.HEROKU_ID || addonManifest.id,
-    password: process.env.HEROKU_PASSWORD || addonManifest.api.password
+    password: process.env.HEROKU_PASSWORD || addonManifest.api.password,
+    sso_salt: process.env.HEROKU_SSO_SALT || addonManifest.api.sso_salt
   },
   log: {
     level: process.env.LOG_LEVEL || 'info'
