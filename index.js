@@ -72,7 +72,8 @@ app.use('/heroku', function enforceAuth(req, res, next) {
  * Also this should inject the Heroku header bar
  * https://github.com/heroku/boomerang
  */
-app.post('/heroku/dashboard', function forwardToDashboard(req, res) {
+app.post('/dashboard', function forwardToDashboard(req, res) {
+  // Will move all this sso logic to middleware
   var ssoSalt = config.heroku.sso_salt;
   var preToken = req.params.id + ':' + ssoSalt + ':' + req.params.timestamp;
   var shasum = crypto.createHash('sha1');
@@ -88,14 +89,16 @@ app.post('/heroku/dashboard', function forwardToDashboard(req, res) {
     //if !account return res.status(404);
 
     //res.session.user = account.id; // When we actually have the account
-    res.session.user = req.params.id;
 
+    res.session.user = req.params.id;
     req.session.heroku_sso = true;
 
-    return res.redirect(dashboard);
+    return res.redirect(dashboard).end();
   }
 
-  return res.status(403);
+  //return res.status(403).end();
+  // Always return the redirect until we have sso working
+  return res.redirect(dashboard);
 });
 
 /*
