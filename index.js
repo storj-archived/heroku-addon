@@ -66,6 +66,39 @@ app.use('/heroku', function enforceAuth(req, res, next) {
 });
 
 /*
+ * POST /heroku/dashboard
+ *
+ * Authorize a user, create a cookie and forward them to their dashboard
+ * Also this should inject the Heroku header bar
+ * https://github.com/heroku/boomerang
+ */
+app.post('/heroku/dashboard', function forwardToDashboard(req, res) {
+  var ssoSalt = config.heroku.sso_salt;
+  var preToken = req.params.id + ':' + ssoSalt + ':' + req.params.timestamp;
+  var shasum = crypto.createHash('sha1');
+  var token = shasum.update(preToken).toString();
+  var dashboard = 'https://storj.io/heroku';
+
+  var validToken = (token === req.params.token);
+  var currentToken = (req.params.timestamp < (Date.now() - 2*60));
+
+  if (validToken && currentToken) {
+    //var account = Account.find(req.params.id) // Find the users account
+
+    //if !account return res.status(404);
+
+    //res.session.user = account.id; // When we actually have the account
+    res.session.user = req.params.id;
+
+    req.session.heroku_sso = true;
+
+    return res.redirect(dashboard);
+  }
+
+  return res.status(403);
+});
+
+/*
  * POST /horoku/resources
  *
  * Create a new storj resource for a customer
