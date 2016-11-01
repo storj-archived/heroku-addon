@@ -113,7 +113,7 @@ app.use('/heroku', function enforceAuth(req, res, next) {
     // If either the id or password don't match, reject the request
     log.error(`${req.uuid}: Incomming request failed authentication`);
     log.error(`${req.uuid}: ID: "${creds.name}" Password: "${creds.pass}"`);
-    return res.status(403).end();
+    return res.status(401).end();
   }
   // If we pass authentication, let the next handler take over
   next();
