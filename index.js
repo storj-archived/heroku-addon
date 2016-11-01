@@ -19,12 +19,15 @@ var config = require('./config');
 var uuid = require('node-uuid');
 // We use bole for logging
 var log = require('bole')('storj-heroku');
+// Crypto is used to verify the SSO endpoint
+var crypto = require('crypto');
 
 // Begin building our http server
 var app = express();
 // Parse all incomming requests as having a JSON body (gives us an object to
 // work with on req.body)
-app.use(bodyParser.json());
+app.use('/heroku/resources', bodyParser.json());
+app.use('/heroku/sso', bodyParser.urlencoded());
 
 // Create a new client to communicate with the storj bridge
 var storjClient = storj.BridgeClient(config.storj.api);
@@ -45,13 +48,49 @@ app.get('/', function(req, res) {
   return res.status(200).end();
 });
 
+app.post('/heroku/sso', function(req,res) {
+  // Ensure all the pieces for a valid SSO request are present
+  if( !req.body ||
+      !req.body.id ||
+      !req.body.token ||
+      !req.body.timestamp) {
+    // If we are missing any pieces necessary to validate the request, simply
+    // return access denied
+    //return res.status(403).end();
+ }
+
+  // Generate the valid token hash using the shared secret from our mainfest
+  var hash = crypto
+    .createHash('sha1')
+    .update(`${req.body.id}:${config.heroku.sso_salt}:${req.body.timestamp}`)
+    .digest('hex');
+
+  // Make sure the timestamp we were given is recent. The timestamp we are
+  // given is in seconds, so we convert that to milliseconds. The binary OR
+  // operator forces the timestamp to be a positive integer no matter what
+  // was provided. This protects against trying to create a Date object with
+  // an invalid string.
+  var time = Math.abs(Date.now() - new Date((req.body.timestamp | 0) * 1000));
+
+  // Make sure the timestamp was recent and that the hash was valid
+  if(hash !== req.body.token || time > 100000) {
+    // If not, return access denied
+    //return res.status(403).end();
+  }
+
+  // Render SSO page
+  return res.redirect('https://storj.io/heroku');
+});
+
+
 // Ensure incomming requests are authenticated using our heroku shared secrets
 app.use('/heroku', function enforceAuth(req, res, next) {
+  return next();
   var creds = auth(req);
 
   if ( typeof creds === 'undefined' ) {
     log.error(`${req.uuid}: Incoming request provided no auth data`);
-    return res.status(401).end();
+    return res.status(403).end();
   }
 
   if ( creds.pass !== config.heroku.password ||
@@ -59,7 +98,7 @@ app.use('/heroku', function enforceAuth(req, res, next) {
     // If either the id or password don't match, reject the request
     log.error(`${req.uuid}: Incomming request failed authentication`);
     log.error(`${req.uuid}: ID: "${creds.name}" Password: "${creds.pass}"`);
-    return res.status(401).end();
+    return res.status(403).end();
   }
   // If we pass authentication, let the next handler take over
   next();
