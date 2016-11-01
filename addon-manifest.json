@@ -19,7 +19,7 @@
     "sso_salt": "93e974fa0279ca541dca346f1efebf9d",
     "production": {
       "base_url": "https://heroku.storj.io/heroku/resources",
-      "sso_url": "https://heroku.storj.io/heroku/resources"
+      "sso_url": "https://heroku.storj.io/heroku/sso"
     },
     "test": {
       "base_url": "http://localhost:8080/heroku/resources",
