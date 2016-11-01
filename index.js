@@ -79,8 +79,12 @@ app.post('/heroku/sso', function(req,res) {
   if(hash !== req.body.token || time > 100000) {
     // If not, return access denied
     log.info(`${req.uuid}: Failed ${hash} !== ${req.body.token} || ${time}`);
-    return res.status(401).end();
+    return res.status(403).end();
   }
+
+  // The heroku endpoint only checks that this cookie is set, nothing more. So
+  // we can return whatever we want as the value.
+  res.cookie('heroku-nav-data', 'foobar');
 
   // Render SSO page
   return res.end(`
@@ -109,7 +113,7 @@ app.use('/heroku', function enforceAuth(req, res, next) {
     // If either the id or password don't match, reject the request
     log.error(`${req.uuid}: Incomming request failed authentication`);
     log.error(`${req.uuid}: ID: "${creds.name}" Password: "${creds.pass}"`);
-    return res.status(401).end();
+    return res.status(403).end();
   }
   // If we pass authentication, let the next handler take over
   next();
