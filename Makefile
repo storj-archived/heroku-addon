@@ -29,5 +29,8 @@ deps:
 	echo
 	echo "    * docker $(shell which docker > /dev/null || echo '- \033[31mNOT INSTALLED\033[37m')"
 	echo "    * docker-compose $(shell which docker-compose > /dev/null || echo '- \033[31mNOT INSTALLED\033[37m')"
+	echo "    * sed $(shell which sed > /dev/null || echo '- \033[31mNOT INSTALLED\033[37m')"
+	echo "    * grep $(shell which grep > /dev/null || echo '- \033[31mNOT INSTALLED\033[37m')"
+	echo "    * sleep $(shell which sleep > /dev/null || echo '- \033[31mNOT INSTALLED\033[37m')"
 
 .PHONY: docker-clean docker-build test deps
