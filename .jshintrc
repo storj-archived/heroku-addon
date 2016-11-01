@@ -24,7 +24,6 @@
   "unused": true,
   "maxparams": 4,
   "maxstatements": 12,
-  "maxcomplexity": 6,
   "maxdepth": 3,
   "maxlen": 80,
   "multistr": true,

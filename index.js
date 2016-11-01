@@ -56,8 +56,11 @@ app.post('/heroku/sso', function(req,res) {
       !req.body.timestamp) {
     // If we are missing any pieces necessary to validate the request, simply
     // return access denied
-    //return res.status(403).end();
- }
+    log.info(`${req.uuid}: Rejected SSO request`);
+    return res.status(401).end();
+  }
+
+  log.info(`${req.uuid}: Received SSO request for ${req.body.id}`);
 
   // Generate the valid token hash using the shared secret from our mainfest
   var hash = crypto
@@ -75,22 +78,30 @@ app.post('/heroku/sso', function(req,res) {
   // Make sure the timestamp was recent and that the hash was valid
   if(hash !== req.body.token || time > 100000) {
     // If not, return access denied
-    //return res.status(403).end();
+    log.info(`${req.uuid}: Failed ${hash} !== ${req.body.token} || ${time}`);
+    return res.status(401).end();
   }
 
   // Render SSO page
-  return res.redirect('https://storj.io/heroku');
+  return res.end(`
+<html>
+  <body style="border:0; margin:0; padding: 0;">
+    <iframe
+      style="width: 100%; height: 100%; border: 0;"
+      src="https://storj.io/heroku"/>
+  </body>
+</html>
+  `);
 });
 
 
 // Ensure incomming requests are authenticated using our heroku shared secrets
 app.use('/heroku', function enforceAuth(req, res, next) {
-  return next();
   var creds = auth(req);
 
   if ( typeof creds === 'undefined' ) {
     log.error(`${req.uuid}: Incoming request provided no auth data`);
-    return res.status(403).end();
+    return res.status(401).end();
   }
 
   if ( creds.pass !== config.heroku.password ||
@@ -98,7 +109,7 @@ app.use('/heroku', function enforceAuth(req, res, next) {
     // If either the id or password don't match, reject the request
     log.error(`${req.uuid}: Incomming request failed authentication`);
     log.error(`${req.uuid}: ID: "${creds.name}" Password: "${creds.pass}"`);
-    return res.status(403).end();
+    return res.status(401).end();
   }
   // If we pass authentication, let the next handler take over
   next();
