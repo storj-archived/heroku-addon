@@ -87,15 +87,7 @@ app.post('/heroku/sso', function(req,res) {
   res.cookie('heroku-nav-data', 'foobar');
 
   // Render SSO page
-  return res.end(`
-<html>
-  <body style="border:0; margin:0; padding: 0;">
-    <iframe
-      style="width: 100%; height: 100%; border: 0;"
-      src="https://storj.io/heroku"/>
-  </body>
-</html>
-  `);
+  return res.redirect('http://storj.io/heroku');
 });
 
 
