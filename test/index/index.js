@@ -9,11 +9,18 @@ var dbMock = {
   close: function () {}
 };
 
+var old_retry = config.retry;
+
 // Use the same server for all tests
 var port = 8000;
 var server;
 
 test('Setup', function (t) {
+  config.retry = {
+    count: 5,
+    baseDelay: 0,
+    exponent: 0,
+  };
   t.pass('Mocking db.js and clearing index.js cache');
   require('../../db.js');
   require.cache[require.resolve('../../db.js')].exports = dbMock;
@@ -24,6 +31,8 @@ test('Setup', function (t) {
 });
 
 test('POST handles failing db insert', function (t) {
+  t.plan(7);
+
   var reqOpts = {
     auth: {
       'user': config.heroku.id,
@@ -37,6 +46,7 @@ test('POST handles failing db insert', function (t) {
   };
 
   dbMock.insert = function (doc, cb) {
+    t.ok('Called insert');
     return cb(new Error('foobar!'));
   };
 
@@ -44,8 +54,7 @@ test('POST handles failing db insert', function (t) {
     reqOpts,
     function userCreated (e, res) {
       t.error(e, 'Http request complets without error');
-      t.equal(res.statusCode, 503, `POST fails`);
-      t.end();
+      t.equal(res.statusCode, 200, `POST fails`);
   });
 });
 
@@ -57,6 +66,7 @@ test('Close server', function (t) {
 
 test('Cleanup', function (t) {
   t.pass('Resetting db.js and index.js cache');
+  config.retry = old_retry;
   delete require.cache[require.resolve('../../db.js')];
   delete require.cache[require.resolve('../../index.js')];
   require('../../index.js');

@@ -33,6 +33,11 @@ module.exports = {
   },
   log: {
     level: process.env.LOG_LEVEL || 'info'
+  },
+  retry: {
+    count: 15,
+    baseDelay: 50,
+    exponent: 2
   }
 };
 
@@ -54,7 +59,3 @@ function scrubConfig(config) {
 }
 
 scrubConfig(module.exports);
-
-// Lock this config object down so we can't accidentally change it during
-// runtime
-Object.freeze(module.exports);
