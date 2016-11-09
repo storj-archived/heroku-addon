@@ -23,6 +23,10 @@ var log = require('bole')('storj-heroku');
 var crypto = require('crypto');
 // We use async for our retry logic
 var async = require('async');
+// We use fs to write documents to disk if db inserts fail
+var fs = require('fs');
+// We use path to get the pathname for files written by fs
+var path = require('path');
 
 // Begin building our http server
 var app = express();
@@ -197,6 +201,12 @@ app.post('/heroku/resources', function provisionRequest(req, res) {
         }
         return cb(e);
       });
+    }, function (e) {
+      if(e) {
+        // Persist to disk if this failed
+        var file = path.join(__dirname, `${document.id}.fail.json`);
+        fs.writeFile(file, JSON.stringify(document));
+      }
     });
   });
 });
