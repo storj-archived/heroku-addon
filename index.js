@@ -21,6 +21,12 @@ var uuid = require('node-uuid');
 var log = require('bole')('storj-heroku');
 // Crypto is used to verify the SSO endpoint
 var crypto = require('crypto');
+// We use async for our retry logic
+var async = require('async');
+// We use fs to write documents to disk if db inserts fail
+var fs = require('fs');
+// We use path to get the pathname for files written by fs
+var path = require('path');
 
 // Begin building our http server
 var app = express();
@@ -142,9 +148,33 @@ app.post('/heroku/resources', function provisionRequest(req, res) {
       });
     }
 
+    // At this point, we have already created a user on the bridge. Since the
+    // bridge already has a bucket registered on behalf of the user, we can
+    // safely let the heroku API know the credentials. We don't want the heroku
+    // plugin to "try again" if we have already created a user.
+    res.json({
+      // Since we are using heroku's UUID for our index key when creating
+      // plans, we can go ahead and send that back to heroku for future
+      // reference
+      'id': req.body.uuid,
+      // The email and password will be provided to the user's dynos as
+      // the environment variables below
+      'config': {
+        'STORJ_EMAIL': email,
+        'STORJ_PASSWORD': password
+      }
+    });
+
+    // Now that the HTTP request has been returned, we aren't racing against a
+    // timeout. We can now safely add retry logic to our DB insert, keeping the
+    // document in memory until we can get it into Mongo. Eventually, after
+    // trying for quite some time, we will simply write the entry to disk for
+    // later recovery.
     log.info(`${req.uuid}: Adding "${email}" to DB`);
+
+    // First we create the document to insert
     var document = {
-      // All add-on are identified by their heroku UUID, so we will use that
+      // All add-ons are identified by their heroku UUID, so we will use that
       // as the index key
       id: req.body.uuid,
       // Assign the user to the plan tier they requested
@@ -158,31 +188,25 @@ app.post('/heroku/resources', function provisionRequest(req, res) {
       active: true
     };
 
-    // Insert our new user into the database
-    db.insert(document, function insertedIntoMongo (e) {
-      // If we fail to add the user to the database, give heroku a 503 and tell
-      // the user what happened
-      if(e) {
-        log.error(`${req.uuid}: ${e.message}`);
-        return res.status(503).json({
-          'message': `${req.uuid}: ` +
-            `Unable to create user in Database, please try again later`
-        });
+    // Setup retry logic and insert our document into the database
+    return async.retry({
+      times: config.retry.count,
+      interval: function (count) {
+        return config.retry.baseDelay * Math.pow(config.retry.exponent, count);
       }
-
-      // Let heroku know that this was a success
-      return res.json({
-        // Since we are using heroku's UUID for our index key when creating
-        // plans, we can go ahead and send that back to heroku for future
-        // reference
-        'id': req.body.uuid,
-        // The email and password will be provided to the user's dynos as
-        // the environment variables below
-        'config': {
-          'STORJ_EMAIL': email,
-          'STORJ_PASSWORD': password
+    }, function (cb) {
+      db.insert(document, function insertedIntoMongo (e) {
+        if(e) {
+          log.error(`${req.uuid}: ${e.message}`);
         }
+        return cb(e);
       });
+    }, function (e) {
+      if(e) {
+        // Persist to disk if this failed
+        var file = path.join(__dirname, `${document.id}.fail.json`);
+        fs.writeFile(file, JSON.stringify(document));
+      }
     });
   });
 });

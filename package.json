@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/retrohacker/storj-heroku-addon",
   "dependencies": {
+    "async": "^2.1.2",
     "basic-auth": "^1.0.4",
     "body-parser": "^1.15.2",
     "bole": "^3.0.1",
