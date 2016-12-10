@@ -1,3 +1,8 @@
+---
+title: Storj
+id: 3563
+
+
 [Storj](https://elements.heroku.com/addons/Storj) object storage provider, allowing application developers to store their data quickly, securely, and for half the price.
 
 Some features:
@@ -6,7 +11,23 @@ Some features:
 - Storj uses blazing fast P2P technology for uploads and downloads. No more waiting to store/retrieve your data. We can go as fast as you can handle.
 - Significantly lower cost than the big guys on bandwidth and storage. Transfer in Storj is always free.
 - Fully open source. Want a feature that doesn't exist yet? Feel free to fork us on [GitHub](https://github.com/storj) and hack away.
-Storj is accessible via an API and has supported client libraries for [[Java|Node.js]]*.
+Storj is accessible via an API and has supported client libraries for [Node.js](https://github.com/Storj/core).
+
+## Using Storj Add-on with Heroku
+We have prepared a bunch of video tutorials to help you get started, which you can find [here](https://www.youtube.com/playlist?list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N).
+
+1. [Deploying Application](https://www.youtube.com/watch?v=OPny2_ehLPU&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=1)
+2. [Adding Storj to Heroku Application](https://www.youtube.com/watch?v=J-NTSvBb_BA&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=2)
+3. [Activating Account](https://www.youtube.com/watch?v=PGPvcUu8w9I&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=3&t=1s)
+4. [Exploring Demo Application](https://www.youtube.com/watch?v=lLmlDHMojRo&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=4)
+5. [Authentication](https://www.youtube.com/watch?v=k_YG3fvOO-U&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=5)
+6. [Key Pair](https://www.youtube.com/watch?v=1xgihTzVZ20&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=6)
+7. [Buckets](https://www.youtube.com/watch?v=E864RfLpBWc&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=7)
+8. [Uploading File](https://www.youtube.com/watch?v=YNiduWhdS-g&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=8)
+9. [Listing File](https://www.youtube.com/watch?v=trlFLc7Aow8&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=9)
+10. [Downloading File](https://www.youtube.com/watch?v=J2cyfknQ5c0&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=10)
+11. [Pushing to Heroku](https://www.youtube.com/watch?v=44PJWhM_9Gs&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=11)
+12. [Recap and Next Steps](https://www.youtube.com/watch?v=HnKuUDFCvLg&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=12)
 
 ## Provisioning the add-on
 
@@ -20,7 +41,7 @@ $ heroku addons:create storj --app APP_NAME
 -----> Adding Storj to sharp-mountain-4005... done, v18 (free)
 ```
 
-Once Storj has been added a `ADDON-CONFIG-NAME` setting will be available in the app configuration and will contain the `STORJ_EMAIL` and `STORJ_PASSWORD` settings. This can be confirmed using the `heroku config` command.
+Once Storj has been added, two config vars will be available in the app configuration, containing the `STORJ_EMAIL` and `STORJ_PASSWORD` settings. This can be confirmed using the `heroku config` command.
 
 ```term
 $ heroku config | grep STORJ
@@ -101,7 +122,7 @@ To use Storj from languages other than Node.js, please refer to our [API Documen
 
 ## Troubleshooting
 
-If you have any issues we have a public Slack you can join [here](https://storj.io/community.html). Community members and staff are there to help people there 24/7.
+If you have any issues we have a public community chat you can join [here](https://storj.io/community.html). Community members and staff are there to help people there 24/7.
 
 ## Migrating between plans
 
