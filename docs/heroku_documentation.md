@@ -36,8 +36,10 @@ Storj can be attached to a Heroku application via the CLI:
 > callout
 > A list of all plans available can be found [here](https://elements.heroku.com/addons/Storj).
 
+Note: You must have already created a Heroku application, either through the web interface or with `$ heroku create APP_NAME`
+
 ```term
-$ heroku addons:create storj --app APP_NAME
+$ heroku addons:create storj:test --app APP_NAME
 -----> Adding Storj to sharp-mountain-4005... done, v18 (free)
 ```
 
