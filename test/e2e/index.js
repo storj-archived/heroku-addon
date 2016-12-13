@@ -12,6 +12,8 @@ var http = require(`http`);
 var port = 8000;
 var server = index(port);
 
+var user_id = null;
+
 test(`Creating user sends email`, function (t) {
   var reqOpts = {
     auth: {
@@ -42,7 +44,8 @@ test(`Creating user sends email`, function (t) {
   });
 });
 
-test(`Creating multiple identical users fails`, function(t) {
+// We want this to succeed for a many-to-many relationship
+test(`Creating multiple identical users succeeds`, function(t) {
   var reqOpts = {
     auth: {
       'user': config.heroku.id,
@@ -58,8 +61,9 @@ test(`Creating multiple identical users fails`, function(t) {
   request.post(`http://127.0.0.1:${port}/heroku/resources`,
     reqOpts,
     function userCreated (e, res) {
+      user_id = res.body.id;
       t.error(e, 'Http request complets without error');
-      t.equal(res.statusCode, 503, `Fails to create user`);
+      t.equal(res.statusCode, 200, `Creates user`);
       t.end();
   });
 });
@@ -76,11 +80,11 @@ test(`Updating user changes user plan in db`, function (t) {
     json: true
   };
 
-  var url = `http://127.0.0.1:${port}/heroku/resources/${uuid}`;
+  var url = `http://127.0.0.1:${port}/heroku/resources/${user_id}`;
   request.put(url, reqOpts, function (e, res) {
     t.error(e, 'Http request complets without error');
     t.equal(res.statusCode, 200, `Update worked`);
-    db.get({ id: uuid }, function (e, doc) {
+    db.get({ id: user_id }, function (e, doc) {
       t.error(e, 'db get complets without error');
       if(e) { throw e; }
       t.equal(doc.tier, `foobar`);
@@ -119,7 +123,7 @@ test(`Deleting user removes user from the database`, function (t) {
     json: true
   };
 
-  var url = `http://127.0.0.1:${port}/heroku/resources/${uuid}`;
+  var url = `http://127.0.0.1:${port}/heroku/resources/${user_id}`;
   request.delete(url, reqOpts, function (e, res) {
     t.error(e, 'Http request complets without error');
     t.equal(res.statusCode, 200, `User removed`);
@@ -136,7 +140,7 @@ test(`Deleting user twice fails`, function (t) {
     json: true
   };
 
-  var url = `http://127.0.0.1:${port}/heroku/resources/${uuid}`;
+  var url = `http://127.0.0.1:${port}/heroku/resources/${user_id}`;
   request.delete(url, reqOpts, function (e, res) {
     t.error(e, 'Http request complets without error');
     t.equal(res.statusCode, 503, `User can\`t be removed`);
