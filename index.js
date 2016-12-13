@@ -93,7 +93,7 @@ app.post('/heroku/sso', function(req,res) {
   res.cookie('heroku-nav-data', 'foobar');
 
   // Render SSO page
-  return res.redirect('http://storj.io/heroku');
+  return res.redirect(`http://storj.io/heroku.html?app=${req.body.app}`);
 });
 
 
