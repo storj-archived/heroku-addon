@@ -74,6 +74,12 @@ app.post('/heroku/sso', function(req,res) {
     .update(`${req.body.id}:${config.heroku.sso_salt}:${req.body.timestamp}`)
     .digest('hex');
 
+  // Temporarily accept the old SSO hash until heroku changes over
+  var legacyHash = crypto
+    .createHash('sha1')
+    .update(`${req.body.id}:${config.heroku.legacy_salt}:${req.body.timestamp}`)
+    .digest('hex');
+
   // Make sure the timestamp we were given is recent. The timestamp we are
   // given is in seconds, so we convert that to milliseconds. The binary OR
   // operator forces the timestamp to be a positive integer no matter what
@@ -81,11 +87,17 @@ app.post('/heroku/sso', function(req,res) {
   // an invalid string.
   var time = Math.abs(Date.now() - new Date((req.body.timestamp | 0) * 1000));
 
+  // Watch for the change
+  log.info(`${req.uuid}: legacyHash - ${legacyHash}`);
+  log.info(`${req.uuid}: hash - ${hash}`);
+  log.info(`${req.uuid}: token - ${req.body.token}`);
+
   // Make sure the timestamp was recent and that the hash was valid
-  if(hash !== req.body.token || time > 100000) {
-    // If not, return access denied
-    log.info(`${req.uuid}: Failed ${hash} !== ${req.body.token} || ${time}`);
-    return res.status(403).end();
+  if( (hash !== req.body.token && legacyHash !== req.body.token) ||
+    time > 100000) {
+      // If not, return access denied
+      log.info(`${req.uuid}: Failed ${hash} !== ${req.body.token} || ${time}`);
+      return res.status(403).end();
   }
 
   // The heroku endpoint only checks that this cookie is set, nothing more. So
@@ -95,7 +107,6 @@ app.post('/heroku/sso', function(req,res) {
   // Render SSO page
   return res.redirect(`http://storj.io/heroku.html?app=${req.body.app}`);
 });
-
 
 // Ensure incomming requests are authenticated using our heroku shared secrets
 app.use('/heroku', function enforceAuth(req, res, next) {
