@@ -34,7 +34,7 @@ test(`Creating user sends email`, function (t) {
     callback.close(function () {
       t.end();
     });
-  }).listen(8080);
+  }).listen(8081);
 
   request.post(`http://127.0.0.1:${port}/heroku/resources`,
     reqOpts,
