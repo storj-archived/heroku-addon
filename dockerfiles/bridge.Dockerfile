@@ -1,14 +1,15 @@
-FROM nodesource/node:4
+FROM node:6
 
 RUN rm -rf /usr/src/app
-RUN git clone https://github.com/Storj/bridge.git /usr/src/app
+RUN git clone https://github.com/Storj/bridge.git /usr/src/app \
+ && cd /usr/src/app \
+ && git checkout 52e6fc5e1bea4a3d762bb1e47b0fb24426cdf0e6
 WORKDIR /usr/src/app
 
 ENV NODE_ENV integration
 
-RUN npm install --production
-
-RUN npm link
+RUN npm install --production \
+ && npm link
 
 RUN mkdir -p ./.storj-bridge/config
 ENV STORJ_BRIDGE_DIR /usr/src/app
@@ -30,13 +31,10 @@ RUN echo ' \
     "timeout": 60000, \
     "port": 8080 \
   }, \
-  "storage": [ \
-    { \
-      "name": "bridge", \
-      "host": "service_bridge_mongodb", \
-      "port": 27017 \
-    } \
-  ], \
+  "storage":{ \
+      "mongoUrl": "mongodb://service_bridge_mongodb:27017/bridge", \
+      "mongoOpts": {} \
+  }, \
   "messaging": { \
     "url": "amqp://service_bridge_rabbitmq", \
     "queues": { \
