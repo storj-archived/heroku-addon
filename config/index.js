@@ -16,6 +16,7 @@ module.exports = {
       server: {
         ssl: ( process.env.MONGO_SSL === 'true' ) || false,
         sslValidate: ( process.env.MONGO_SSL_VALIDATE  === 'true' ) || false,
+        sslAllowInvalidHostnames: ( process.env.MONGO_SSL_ALLOW_INVALID_HOSTNAMES === 'true' ) || false
       },
       replSet: {
         rs_name: process.env.MONGO_RS_NAME || undefined
