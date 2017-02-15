@@ -74,6 +74,12 @@ app.post('/heroku/sso', function(req,res) {
     .update(`${req.body.id}:${config.heroku.sso_salt}:${req.body.timestamp}`)
     .digest('hex');
 
+  // Temporarily accept the old SSO hash until heroku changes over
+  var legacyHash = crypto
+    .createHash('sha1')
+    .update(`${req.body.id}:${config.heroku.legacy_salt}:${req.body.timestamp}`)
+    .digest('hex');
+
   // Make sure the timestamp we were given is recent. The timestamp we are
   // given is in seconds, so we convert that to milliseconds. The binary OR
   // operator forces the timestamp to be a positive integer no matter what
@@ -81,11 +87,17 @@ app.post('/heroku/sso', function(req,res) {
   // an invalid string.
   var time = Math.abs(Date.now() - new Date((req.body.timestamp | 0) * 1000));
 
+  // Watch for the change
+  log.info(`${req.uuid}: legacyHash - ${legacyHash}`);
+  log.info(`${req.uuid}: hash - ${hash}`);
+  log.info(`${req.uuid}: token - ${req.body.token}`);
+
   // Make sure the timestamp was recent and that the hash was valid
-  if(hash !== req.body.token || time > 100000) {
-    // If not, return access denied
-    log.info(`${req.uuid}: Failed ${hash} !== ${req.body.token} || ${time}`);
-    return res.status(403).end();
+  if( (hash !== req.body.token && legacyHash !== req.body.token) ||
+    time > 100000) {
+      // If not, return access denied
+      log.info(`${req.uuid}: Failed ${hash} !== ${req.body.token} || ${time}`);
+      return res.status(403).end();
   }
 
   // The heroku endpoint only checks that this cookie is set, nothing more. So
@@ -93,9 +105,8 @@ app.post('/heroku/sso', function(req,res) {
   res.cookie('heroku-nav-data', 'foobar');
 
   // Render SSO page
-  return res.redirect('http://storj.io/heroku');
+  return res.redirect(`http://storj.io/heroku.html?app=${req.body.app}`);
 });
-
 
 // Ensure incomming requests are authenticated using our heroku shared secrets
 app.use('/heroku', function enforceAuth(req, res, next) {
@@ -127,8 +138,11 @@ app.post('/heroku/resources', function provisionRequest(req, res) {
   // of the heroku add-on at our own email service. This allows the bridge to
   // send an email to this user in it's normal fashion, that email will be
   // intercepted by another one of our services and forwarded onto the user's
-  // real email address
-  var email = `${req.body.uuid}@heroku.storj.io`;
+  // real email address We append the uuid of the request to the addon's user
+  // so that we can distinguish between multiple addon-ons attached to the same
+  // app.
+  var uuid = `${req.body.uuid}_${req.uuid.split('-').join('')}`;
+  var email = `${uuid}@heroku.storj.io`;
   // Generate a random password for our user
   var password = crypto.randomBytes(48).toString('base64');
   log.info(`${req.uuid}: Creating user: "${email}"`);
@@ -153,10 +167,9 @@ app.post('/heroku/resources', function provisionRequest(req, res) {
     // safely let the heroku API know the credentials. We don't want the heroku
     // plugin to "try again" if we have already created a user.
     res.json({
-      // Since we are using heroku's UUID for our index key when creating
-      // plans, we can go ahead and send that back to heroku for future
-      // reference
-      'id': req.body.uuid,
+      // We use the uuid created above to uniquely identify this addon, so that
+      // both heroku and storj use the same name to refer to the same addon.
+      'id': uuid,
       // The email and password will be provided to the user's dynos as
       // the environment variables below
       'config': {
@@ -174,9 +187,9 @@ app.post('/heroku/resources', function provisionRequest(req, res) {
 
     // First we create the document to insert
     var document = {
-      // All add-ons are identified by their heroku UUID, so we will use that
-      // as the index key
-      id: req.body.uuid,
+      // We use the shared UUID we generated for this addon as the id of the
+      // mongodb document
+      id: uuid,
       // Assign the user to the plan tier they requested
       tier: req.body.plan,
       // The active key reflects if this add-on is still live on heroku. Since

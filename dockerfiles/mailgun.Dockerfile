@@ -1,4 +1,4 @@
-FROM nodesource/node:4
+FROM node:6
 
 ADD ./mock-mailgun/package.json .
 RUN npm install

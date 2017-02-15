@@ -15,7 +15,8 @@ module.exports = {
     options: {
       server: {
         ssl: ( process.env.MONGO_SSL === 'true' ) || false,
-        sslValidate: ( process.env.MONGO_SSL_VALIDATE  === 'true' ) || false,
+        sslAllowInvalidCertificates: ( process.env.MONGO_SSL_ALLOW_INVALID_CERTIFICATES  === 'true' ) || false,
+        sslAllowInvalidHostnames: ( process.env.MONGO_SSL_ALLOW_INVALID_HOSTNAMES === 'true' ) || false
       },
       replSet: {
         rs_name: process.env.MONGO_RS_NAME || undefined
@@ -28,6 +29,7 @@ module.exports = {
   // is expecting
   heroku: {
     sso_salt: process.env.HEROKU_SSO || addonManifest.api.sso_salt,
+    legacy_salt: process.env.LEGACY_SSO || addonManifest.api.sso_salt,
     id: process.env.HEROKU_ID || addonManifest.id,
     password: process.env.HEROKU_PASSWORD || addonManifest.api.password
   },
