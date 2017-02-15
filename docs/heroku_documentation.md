@@ -9,23 +9,26 @@ Some features:
 
 - All data is encrypted client side. Unlike other cloud storage providers, Storj has no access to your data.
 - Storj uses blazing fast P2P technology for uploads and downloads. No more waiting to store/retrieve your data. We can go as fast as you can handle.
-- Significantly lower cost than the big guys on bandwidth and storage. Transfer in Storj is always free.
+- Significantly lower cost than the big guys on bandwidth and storage.
 - Fully open source. Want a feature that doesn't exist yet? Feel free to fork us on [GitHub](https://github.com/storj) and hack away.
 Storj is accessible via an API and has supported client libraries for [Node.js](https://github.com/Storj/core).
 
 ## Using Storj Add-on with Heroku
 We have prepared a bunch of video tutorials to help you get started, which you can find [here](https://www.youtube.com/playlist?list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N).
 
+> callout
+> Note: Some of the videos are now deprecated due to updates on the core code for Storj. *Changes to reflect that have been made to the [example application](https://github.com/storj/storj-node-heroku-example.git)*. Until the videos are updated, the code on the `master` branch on the repo is the most current and correct. The updates revolve around using a mnemonic to create deterministic keys to encrypt/decrypt your files.
+
 1. [Deploying Application](https://www.youtube.com/watch?v=OPny2_ehLPU&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=1)
 2. [Adding Storj to Heroku Application](https://www.youtube.com/watch?v=J-NTSvBb_BA&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=2)
-3. [Activating Account](https://www.youtube.com/watch?v=PGPvcUu8w9I&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=3&t=1s)
+3. [Activating Account](https://www.youtube.com/watch?v=PGPvcUu8w9I&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=3&t=1s) - [deprecated (we do this for you now)]
 4. [Exploring Demo Application](https://www.youtube.com/watch?v=lLmlDHMojRo&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=4)
 5. [Authentication](https://www.youtube.com/watch?v=k_YG3fvOO-U&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=5)
 6. [Key Pair](https://www.youtube.com/watch?v=1xgihTzVZ20&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=6)
 7. [Buckets](https://www.youtube.com/watch?v=E864RfLpBWc&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=7)
-8. [Uploading File](https://www.youtube.com/watch?v=YNiduWhdS-g&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=8)
+8. [Uploading File](https://www.youtube.com/watch?v=YNiduWhdS-g&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=8) - [deprecated]
 9. [Listing File](https://www.youtube.com/watch?v=trlFLc7Aow8&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=9)
-10. [Downloading File](https://www.youtube.com/watch?v=J2cyfknQ5c0&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=10)
+10. [Downloading File](https://www.youtube.com/watch?v=J2cyfknQ5c0&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=10) - [deprecated]
 11. [Pushing to Heroku](https://www.youtube.com/watch?v=44PJWhM_9Gs&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=11)
 12. [Recap and Next Steps](https://www.youtube.com/watch?v=HnKuUDFCvLg&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=12)
 
@@ -39,11 +42,11 @@ Storj can be attached to a Heroku application via the CLI:
 Note: You must have already created a Heroku application, either through the web interface or with `$ heroku create APP_NAME`
 
 ```term
-$ heroku addons:create storj:test --app APP_NAME
+$ heroku addons:create storj:hobbyist --app APP_NAME
 -----> Adding Storj to sharp-mountain-4005... done, v18 (free)
 ```
 
-Once Storj has been added, two config vars will be available in the app configuration, containing the `STORJ_EMAIL` and `STORJ_PASSWORD` settings. This can be confirmed using the `heroku config` command.
+Once Storj has been added, two config vars will be available in the app configuration: `STORJ_EMAIL` and `STORJ_PASSWORD`. This can be confirmed using the `heroku config` command.
 
 ```term
 $ heroku config | grep STORJ
@@ -52,7 +55,10 @@ STORJ_EMAIL:    d2e49203-4ae1-40e7-b544-191391ba91fe@heroku.storj.io
 STORJ_PASSWORD: vXgmwVkmo8g2F6Ey2x33pWOd4+tHZDmlV/GA1v9ty42RompNa2QswVXtXMeukwxI
 ```
 
-After installing Storj the application should be configured to fully integrate with the add-on.
+After installing the Storj add-on, you can start using Storj with your application.
+
+> callout
+> Note: Depending on how you want to upload/download files, you'll need to also add a `STORJ_MNEMONIC` environment variable. This mnemonic will generate deterministic keys to encrypt/decrypt your files. See the [example application](https://github.com/storj/storj-node-heroku-example.git) for how this works.
 
 ## Local setup
 ### Environment setup
@@ -72,18 +78,18 @@ For more information, see the [Heroku Local](heroku-local) article.
 ### Service setup
 Storj can be configured for use in a local development environment. To do this, you would export the environment variables mentioned above in Environment setup. You will then be able to run your service locally and it will talk to the Storj API.
 
-You can install the Storj CLI to interact with your buckets and files using the following command. To use this, you must have Node.js and NPM installed.
+You can install the Storj CLI to interact with your buckets and files using the following command. Note: to use Storj CLI, you must have Node.js and NPM installed.
 
 ```term
-$ npm install -g storj
+$ npm install -g storj--cli
 ```
 
 ## Using with Node.js
 
-Node.js applications will need to add the following entry into their `package.json` specifying the `storj` client library.
+Node.js applications will need to add the following entry into their `package.json` specifying the [`storj` client library](https://github.com/storj/core).
 
 ```term
-$ npm install --save storj
+$ npm install --save storj-lib
 ```
 
 Update application dependencies with npm.
@@ -95,11 +101,11 @@ $ npm install
 Configure the [Bridge Client](https://storj.github.io/core/BridgeClient.html):
 
 ```javascript
-var storj = require('storj');
+var storj = require('storj-lib');
 
 var bridgeURL = "https://api.storj.io"
 var options = {
-  basicauth: {
+  basicAuth: {
     email: process.env.STORJ_EMAIL,
     password: process.env.STORJ_PASSWORD
   }
@@ -108,11 +114,8 @@ var options = {
 var client = new storj.BridgeClient(bridgeURL, options);
 ```
 
-For usage examples please refer to our [Storj Core Documentation](https://storj.github.io/core/). Here are a few of those examples.
-
-+ [Uploading Files](https://github.com/Storj/core/blob/master/example/6a-upload-file.js)
-+ [Downloading Files](https://github.com/Storj/core/blob/master/example/6b-download-file.js)
-+ [Listing Files](https://github.com/Storj/core/blob/master/example/6c-list-bucket-files.js)
+> callout
+> For additional usage examples, please refer to our [Storj Example App](https://github.com/storj/storj-node-heroku-example).
 
 For help with installing Node.js, please reference [Installing Node.js via package manager](https://nodejs.org/en/download/package-manager/) on the Node.js website.
 
