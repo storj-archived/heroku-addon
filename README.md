@@ -2,6 +2,12 @@
 
 The official Storj add-on for Heroku
 
+## Usage
+
+We created an awesome video tutorial that will help you get up and running with a Storj project on Heroku: 
+
+[![Storj Heroku Video Series](https://img.youtube.com/vi/OPny2_ehLPU/0.jpg)](https://www.youtube.com/watch?v=OPny2_ehLPU&list=PLEr5Xx0gHvFG55T-_kLKlWosSBw32vP9N&index=1)
+
 ## Development
 
 ### Usage
@@ -26,7 +32,7 @@ Instead, run `make`. It will give you all of the supported commands for running 
 
 ### Code coverage
 
-This project uses istanbul for code coverage. If you run `npm run unit`, you will notice relatively low test coverage. The unit tests compliment the integration tests. When you run `make test`, the integration tests will gather test coverage as well giving you the full 100% coverage. After running `make test`, a coverage report will be available on `127.0.0.1:8000`.
+This project uses istanbul for code coverage. If you run `npm run unit`, you will notice relatively low test coverage. The unit tests compliment the integration tests. When you run `make test`, the integration tests will gather test coverage as well give you the full 100% coverage. After running `make test`, a coverage report will be available on `127.0.0.1:8000`.
 
 ## Deployment
 
