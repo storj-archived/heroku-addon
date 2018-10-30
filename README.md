@@ -1,3 +1,5 @@
+**Notice: Development on this repository is currently on pause during our v3 rearchitecture. Please see [storj/storj](https://github.com/storj/storj) for ongoing v3 development.**
+
 # Storj Heroku Add-on
 
 The official Storj add-on for Heroku
